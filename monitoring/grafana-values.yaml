@@ -24,3 +24,8 @@ datasources:
         url: http://prometheus-server
         access: proxy
         isDefault: true
+      - name: Loki
+        type: loki
+        url: http://loki-gateway
+        access: proxy
+        isDefault: false

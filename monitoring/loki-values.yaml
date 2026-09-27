@@ -1,0 +1,52 @@
+# Override для grafana/loki (этап 3 / часть 2 — логи).
+# SingleBinary + filesystem + PVC: хватает для лабы на minikube.
+# Агент сбора (Alloy/Promtail) — отдельно, Loki сам логи не забирает.
+
+deploymentMode: SingleBinary
+
+loki:
+  auth_enabled: false
+  commonConfig:
+    replication_factor: 1
+  # Для учебного кластера достаточно test schema; в проде — явный schemaConfig.
+  useTestSchema: true
+  storage:
+    type: filesystem
+    # Chart всё равно валидирует имена; для filesystem бакеты не используются.
+    bucketNames:
+      chunks: chunks
+      ruler: ruler
+      admin: admin
+
+singleBinary:
+  replicas: 1
+  persistence:
+    enabled: true
+    size: 5Gi
+
+# SimpleScalable по умолчанию тянет write/read/backend — для SingleBinary обнуляем.
+write:
+  replicas: 0
+read:
+  replicas: 0
+backend:
+  replicas: 0
+
+# Gateway оставляем: удобная точка push/query (агент и Grafana ходят сюда).
+gateway:
+  enabled: true
+
+# Memcached на лабе не нужен — меньше подов на minikube.
+chunksCache:
+  enabled: false
+resultsCache:
+  enabled: false
+
+# Canary/test — шум для учебной установки.
+lokiCanary:
+  enabled: false
+test:
+  enabled: false
+
+minio:
+  enabled: false

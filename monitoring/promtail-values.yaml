@@ -1,0 +1,42 @@
+# Override для grafana/promtail (этап 2 части «логи»).
+# DaemonSet на каждой ноде: читает /var/log/pods → push в Loki.
+# Volumes/mounts на hostPath чарт уже кладёт сам.
+#
+# ВАЖНО: чарт = grafana/promtail (НЕ grafana/grafana).
+# Release name может быть promtail, но chart обязан быть promtail.
+
+daemonset:
+  enabled: true
+
+deployment:
+  enabled: false
+
+config:
+  # Оба релиза в ns monitoring → короткого DNS достаточно.
+  clients:
+    - url: http://loki-gateway/loki/api/v1/push
+
+  snippets:
+    # Docker json-file на ноде: {"log":"<stdout>", ...}.
+    # docker:{} достаёт сырую строку; json:{} парсит JSON приложения.
+    pipelineStages:
+      - docker: {}
+      - json:
+          expressions:
+            level: level
+            msg: msg
+            service: service
+            trace_id: trace_id
+            logger: logger
+      - labels:
+          level:
+          service:
+      - output:
+          source: msg
+
+    # Не тащим логи всего кластера — только lab2 (там api).
+    extraRelabelConfigs:
+      - action: keep
+        source_labels:
+          - __meta_kubernetes_namespace
+        regex: lab2
