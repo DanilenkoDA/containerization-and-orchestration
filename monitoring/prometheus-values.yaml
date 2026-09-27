@@ -1,0 +1,21 @@
+# Override для prometheus-community/prometheus (этап 2a).
+# Цель: scrape /metrics у api. Grafana / Alertmanager / Loki — отдельно позже.
+
+server:
+  replicaCount: 1
+# Alertmanager понадобится на этапе 5 — пока не тащим.
+alertmanager:
+  enabled: false
+
+# Push-модель нам не нужна: api отдаёт метрики по pull.
+prometheus-pushgateway:
+  enabled: false
+
+# Доп. scrape jobs (строка YAML, мержится в prometheus.yml).
+# Service DNS стабилен при рестартах пода — в отличие от Pod IP.
+extraScrapeConfigs: |
+  - job_name: api
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - api.lab2.svc.cluster.local:8000

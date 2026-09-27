@@ -1,0 +1,26 @@
+# Override для grafana/grafana (этап 2b).
+# Логин/пароль — из Secret grafana-admin, не из values.
+replicas: 1
+
+admin:
+  existingSecret: grafana-admin
+  userKey: admin-user
+  passwordKey: admin-password
+
+persistence:
+  enabled: true
+  size: 1Gi
+
+initChownData:
+  enabled: false
+
+# Prometheus в том же ns monitoring → короткое DNS-имя сервиса.
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        url: http://prometheus-server
+        access: proxy
+        isDefault: true
