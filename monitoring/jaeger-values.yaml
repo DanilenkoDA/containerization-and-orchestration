@@ -1,0 +1,15 @@
+# Override для jaegertracing/jaeger (часть 3 — трейсы).
+# Chart v4 = Jaeger v2 «одним бинарём»: UI + OTLP + storage in-process.
+# Отдельные Cassandra/ES для лабы не нужны.
+#
+# Service имя: jaeger (ports 4317 gRPC, 4318 HTTP, 16686 UI).
+# api по умолчанию ждёт http://jaeger:4318 — из ns lab2 понадобится FQDN
+# (jaeger.monitoring.svc.cluster.local) — это следующий этап.
+
+jaeger:
+  enabled: true
+  replicas: 1
+
+# ES/Cassandra maintenance jobs не трогаем — spark и прочее выключены в дефолте.
+spark:
+  enabled: false

@@ -1,0 +1,40 @@
+# Простой HTTP echo: Alertmanager шлёт сюда webhook, тело видно в логах пода.
+# Альтернатива: заменить url в prometheus-values на https://webhook.site/<uuid>
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webhook-echo
+  namespace: monitoring
+  labels:
+    app: webhook-echo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webhook-echo
+  template:
+    metadata:
+      labels:
+        app: webhook-echo
+    spec:
+      containers:
+        - name: echo
+          image: mendhak/http-https-echo:31
+          ports:
+            - containerPort: 8080
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webhook-echo
+  namespace: monitoring
+  labels:
+    app: webhook-echo
+spec:
+  selector:
+    app: webhook-echo
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080

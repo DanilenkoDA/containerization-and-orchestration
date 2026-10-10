@@ -1,0 +1,10 @@
+# Override для wiremind/karma (часть 4 — дашборд активных алертов).
+# Karma не считает алерты — только читает API Alertmanager и рисует UI.
+
+replicaCount: 1
+
+env:
+  - name: ALERTMANAGER_URI
+    value: http://prometheus-alertmanager:9093
+  - name: ALERTMANAGER_NAME
+    value: lab

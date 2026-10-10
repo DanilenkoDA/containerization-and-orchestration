@@ -19,6 +19,7 @@ config:
   snippets:
     # Docker json-file на ноде: {"log":"<stdout>", ...}.
     # docker:{} достаёт сырую строку; json:{} парсит JSON приложения.
+    # trace_id — в ТЕКСТ строки (не в label: высокая кардинальность).
     pipelineStages:
       - docker: {}
       - json:
@@ -31,8 +32,11 @@ config:
       - labels:
           level:
           service:
+      - template:
+          source: line
+          template: 'trace_id={{ .trace_id }} {{ .msg }}'
       - output:
-          source: msg
+          source: line
 
     # Не тащим логи всего кластера — только lab2 (там api).
     extraRelabelConfigs:
