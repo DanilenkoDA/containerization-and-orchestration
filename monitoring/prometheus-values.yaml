@@ -35,6 +35,11 @@ extraScrapeConfigs: |
     static_configs:
       - targets:
           - api.lab2.svc.cluster.local:8000
+  - job_name: lab1-cadvisor
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - host.docker.internal:8083
 
 serverFiles:
   alerting_rules.yml:
